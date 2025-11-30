@@ -1,4 +1,5 @@
 (import spork/json)
+(import spork/argparse :prefix "")
 
 (defn try-connect [label ip port]
   (try
@@ -23,12 +24,17 @@
         (def {:label label :ip ip :port port} conn)
         (try-connect-loop label ip port 3)))))
 
+(def ap
+  ["Check if a service is reachable or online"
+   "input" {:kind :option
+            :required true
+            :help "The input json file with a list of objects containing `ip`, `label` and `host` key"}])
+
 (defn main
-  "Entry point"
+  "Entry point for pulse"
   [& args]
-  (let [conn-file (get args 1 nil)]
-    (if (nil? conn-file) 
-      (do
-        (print "JSON file not provided, exiting...")
-        (os/exit 0)))
-    (get-connections conn-file)))
+  (let [res (argparse ;ap)]
+    # unless res has some contents inside it, break.
+    # This targets empty commands and --help
+    (unless (res (break))) 
+    (get-connections (res "input"))))
