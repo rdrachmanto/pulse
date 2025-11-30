@@ -26,5 +26,9 @@
 (defn main
   "Entry point"
   [& args]
-  (print "Hello world")
-  (get-connections "./connections.json"))
+  (let [conn-file (get args 1 nil)]
+    (if (nil? conn-file) 
+      (do
+        (print "JSON file not provided, exiting...")
+        (os/exit 0)))
+    (get-connections conn-file)))
