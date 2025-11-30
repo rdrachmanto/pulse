@@ -2,10 +2,18 @@
 
 (defn try-connect [label ip port]
   (try
-    (with [conn (net/connect ip port)]
-      (print (string "Connected to " label " (" ip ") [port:" port "]"))
-      true)
-    ([err] (print "Connection refused"))))
+    (ev/with-deadline 2
+      (with [conn (net/connect ip port)]
+        (print (string "Connected to " label " (" ip ") [port:" port "]"))
+        true))
+    ([err] (print "Connection to " label " refused"))))
+
+(defn try-connect-loop [label ip port retries]
+  (for i 0 retries
+    (let [ok (try-connect label ip port)]
+      (when ok (break ok)))
+    (when (< i retries)
+      (print "Retrying..."))))
 
 (defn get-connections [path]
   (with [fl (file/open path :r)]
@@ -13,9 +21,9 @@
           jsond (json/decode raw true true)]
       (loop [conn :in jsond]
         (def {:label label :ip ip :port port} conn)
-        (try-connect label ip port)))))
+        (try-connect-loop label ip port 3)))))
 
-(defn main 
+(defn main
   "Entry point"
   [& args]
   (print "Hello world")
