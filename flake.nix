@@ -40,7 +40,7 @@
 
           find $JANET_PATH/. -maxdepth 1 -type l -delete
           for d in "$JANET_TREE/lib"/*; do
-            ln -s "$d" "$JANET_ROOT/$(basename "$d")"
+            ln -s "$d" "$JANET_PATH/$(basename "$d")"
           done
         '';
       };

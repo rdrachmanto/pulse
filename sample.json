@@ -1,0 +1,12 @@
+[
+    {
+        "label": "Device 1",
+        "ip": "IP 1",
+        "port": "Port 1"
+    },
+    {
+        "label": "Device n",
+        "ip": "IP n",
+        "port": "Port n"
+    }
+]
