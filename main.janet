@@ -16,20 +16,21 @@
     (when (< i retries)
       (print "Retrying..."))))
 
+(defn check-json [raw]
+  (try
+    (json/decode raw true true)
+    ([err]
+      (error `Unable to parse JSON file, make sure formatting is correct!
+Hint: JSON file format is [ {"label": "Service 1", "ip": "IP 1", "host": "Host 1"} ]
+      `))))
+
 (defn get-connections [path]
   (with [fl (file/open path :r)]
-    (let [raw (file/read fl :all)]
-      (try
-        (do
-          (def jsond (json/decode raw true true))
+    (let [raw (file/read fl :all)
+          jsond (check-json raw)]
           (loop [conn :in jsond]
            (def {:label label :ip ip :port port} conn)
-           (try-connect-loop label ip port 3)))
-        ([err] 
-          (do 
-            (error `Unable to parse JSON file, make sure format is correct!
-Hint: JSON file format is [ {"label": "Service 1", "ip": "IP 1", "host": "Host 1"} ]`)
-            (os/exit 1)))))))
+           (try-connect-loop label ip port 3)))))
 
 (def ap
   ["Check if a service is reachable or online"
